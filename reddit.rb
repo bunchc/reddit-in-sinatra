@@ -5,8 +5,8 @@ DataMapper::setup(:default,"sqlite3://#{Dir.pwd}/example.db")
 class Link
   include DataMapper::Resource
   property :id, Serial
-  property :title, String, :required => true 
-  property :url, Text, :required => true, :format => :url 
+  property :session, String, :required => true 
+  property :presenter, Text, :required => true #, :format => :url 
   property :points, Integer, :default => 0
   property :created_at, Time
 
@@ -34,7 +34,7 @@ get '/hot' do
 end
 
 post '/' do
-  Link.create(:title => params[:title], :url => params[:url], :created_at => Time.now)
+  Link.create(:session => params[:session], :presenter => params[:presenter], :created_at => Time.now)
   redirect back
 end
 
@@ -56,7 +56,7 @@ __END__
   %body
     .container
       #main
-        .title Learn Sinatra
+        .title #vBrownBag Tech Talk Voting
         .options  
           %a{:href => ('/')} New 
           | 
@@ -85,6 +85,6 @@ __END__
 
 #add-link
   %form{:action => "/", :method => "post"}
-    %input{:type => "text", :name => "title", :placeholder => "Title"}
-    %input{:type => "text", :name => "url", :placeholder => "Url"}
+    %input{:type => "text", :name => "title", :placeholder => "Session"}
+    %input{:type => "text", :name => "url", :placeholder => "Presenter"}
     %input{:type => "submit", :value => "Submit"} 
