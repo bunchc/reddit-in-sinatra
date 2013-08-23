@@ -81,10 +81,13 @@ __END__
       .span6
         %span.link-title
           %h3
-            %a{:href => (l.url)} #{l.title}
+            %p Session:
+              %strong= @l.session 
+            %p Presenter:
+              %strong= @l.presenter
 
 #add-link
   %form{:action => "/", :method => "post"}
-    %input{:type => "text", :name => "title", :placeholder => "Session"}
-    %input{:type => "text", :name => "url", :placeholder => "Presenter"}
+    %input{:type => "text", :name => "session", :placeholder => "Session"}
+    %input{:type => "text", :name => "presenter", :placeholder => "Presenter"}
     %input{:type => "submit", :value => "Submit"} 

@@ -7,3 +7,4 @@ gem "sinatra-reloader"
 gem "haml"
 gem 'puma'
 gem 'puma'
+gem 'puma'
