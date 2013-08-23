@@ -6,5 +6,4 @@ gem "data_mapper"
 gem "sinatra-reloader"
 gem "haml"
 gem 'puma'
-gem 'puma'
-gem 'puma'
+gem 'omniauth-twitter'
