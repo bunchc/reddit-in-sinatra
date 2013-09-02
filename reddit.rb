@@ -109,11 +109,11 @@ put '/:id/vote/:type' do
       if l.votes.new(:username => session[:username]).save
         l.update(:points => l.points + params[:type].to_i)
       else
-        flash[:overdone] = "Sorry, you've already voted for this one."
+        flash[:warning] = "Sorry, you've already voted for this one."
       end
     end
   else
-    flash[:vote] = "You need to log in to vote."
+    flash[:warning] = "You need to log in to vote."
   end
   redirect back
 end 
@@ -138,6 +138,7 @@ __END__
             = link_to '/logout', 'Logout'
           - else
             = link_to '/login', 'Log in with Twitter'
+        = styled_flash
         = yield
 
 @@ index
