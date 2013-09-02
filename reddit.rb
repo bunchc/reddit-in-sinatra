@@ -1,7 +1,7 @@
-%w{sinatra data_mapper haml sinatra/reloader omniauth-twitter}.each { |lib| require lib}
+%w{sinatra sinatra/flash data_mapper haml sinatra/reloader omniauth-twitter}.each { |lib| require lib}
 
 use OmniAuth::Builder do
-  provider :twitter, 'lolkey', 'lolsecret'
+  provider :twitter, 'C7uRLNAIj6IgLbkka9Mbw', '8m1FoCgdjQ2e5CYA2bwymR5wuKWPyf4NxIE4F5MIE'
 end
 
 DataMapper::setup(:default,"sqlite3://#{Dir.pwd}/example.db")
@@ -49,6 +49,12 @@ helpers do
   def admin?
     session[:admin]
   end
+
+  def link_to(url,text=url,opts={})
+    attributes = ""
+    opts.each { |key,value| attributes << key.to_s << "=\"" << value << "\" "}
+    "<a href=\"#{url}\" #{attributes}>#{text}</a>"
+  end
 end
  
 get '/login' do
@@ -59,7 +65,8 @@ get '/auth/twitter/callback' do
   env['omniauth.auth'] ? session[:admin] = true : halt(401,'Not Authorized')
   session[:admin] = true
   session[:username] = env['omniauth.auth']['info']['name']
-  "<h1>Hi #{session[:username]}!</h1>"
+  flash[:login] = "Hi #{session[:username]}"
+  redirect "/"
 end
 
 get '/auth/failure' do
@@ -68,7 +75,8 @@ end
  
 get '/logout' do
   session[:admin] = nil
-  "You are now logged out"
+  flash[:logout] = "You are now logged out"
+  redirect back
 end
 
 get '/' do 
@@ -94,12 +102,18 @@ end
 #  redirect back
 #end 
 
-put '/:id/vote/:type' do 
-  if params[:type].to_i.abs == 1
-    l = Link.get params[:id]
-    if l.votes.new(:username => session[:username]).save
-      l.update(:points => l.points + params[:type].to_i)
+put '/:id/vote/:type' do
+  if session[:admin] 
+    if params[:type].to_i.abs == 1
+      l = Link.get params[:id]
+      if l.votes.new(:username => session[:username]).save
+        l.update(:points => l.points + params[:type].to_i)
+      else
+        flash[:overdone] = "Sorry, you've already voted for this one."
+      end
     end
+  else
+    flash[:vote] = "You need to log in to vote."
   end
   redirect back
 end 
@@ -120,7 +134,10 @@ __END__
           | 
           %a{:href => ('/hot')} Hot
           |
-          %a{:href => ('/login')} Login
+          - if session[:admin]
+            = link_to '/logout', 'Logout'
+          - else
+            = link_to '/login', 'Log in with Twitter'
         = yield
 
 @@ index
